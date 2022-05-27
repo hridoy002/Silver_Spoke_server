@@ -57,6 +57,17 @@ async function run() {
       res.send({ result, token });
     })
 
+    //get all user
+    app.get("/users", async(req,res) =>{
+      // const query = {};
+      // const cursor = usersCollection.find(query);
+      // const result = await cursor.toArray();
+      // res.send(result);
+      const users = await usersCollection.find().toArray();
+      res.send(users);
+    })
+
+
     // get review 
     app.get('/review', async(req,res) =>{
       const query = {};
