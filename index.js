@@ -42,7 +42,17 @@ async function run() {
       res.send(item);
     })
 
-    // user creation 
+    // admin 
+    app.put('/user/admin:email', async (req, res) => {
+      const email = req.params.email;
+      const filter = { email: email };
+      const updateDoc = {
+        $set: {"rule":admin},
+      };
+      const result = await usersCollection.updateOne(filter, updateDoc);    res.send(result);
+    })
+
+    // user store on db
     app.put('/user/:email', async (req, res) => {
       const email = req.params.email;
       const user = req.body;
