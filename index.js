@@ -21,7 +21,9 @@ async function run() {
     await client.connect()
     const toolsCollection = client.db("silver-spoke").collection("tools");
     const usersCollection = client.db("silver-spoke").collection("users");
-    const orderCollection = client.db("silver-spoke").collection("order")
+    const orderCollection = client.db("silver-spoke").collection("order");
+    const reviewCollection = client.db("silver-spoke").collection("review");
+
 
     // get all tools 
     app.get("/tools", async (req, res) => {
@@ -55,7 +57,22 @@ async function run() {
       res.send({ result, token });
     })
 
-    // order collection
+    // get review 
+    app.get('/review', async(req,res) =>{
+      const query = {};
+      const cursor = reviewCollection.find(query);
+      const reviews = await cursor.toArray();
+      res.send(reviews);
+    })
+
+    //review post
+    app.post('/review', async (req,res) =>{
+      const review = req.body;
+      const result = await reviewCollection.insertOne(review);
+      res.send(result);
+    })
+
+    //post order 
     app.post('/order', async (req, res) => {
       const data = req.body;
       const result = await orderCollection.insertOne(data);
