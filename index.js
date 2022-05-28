@@ -43,13 +43,14 @@ async function run() {
     })
 
     // admin 
-    app.put('/user/admin:email', async (req, res) => {
+    app.put('/user/admin/:email', async (req, res) => {
       const email = req.params.email;
       const filter = { email: email };
       const updateDoc = {
-        $set: {"rule":admin},
+        $set: {rule:"admin"},
       };
-      const result = await usersCollection.updateOne(filter, updateDoc);    res.send(result);
+      const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
     })
 
     // user store on db
@@ -91,6 +92,15 @@ async function run() {
       const review = req.body;
       const result = await reviewCollection.insertOne(review);
       res.send(result);
+    })
+
+    // get order for individual user 
+    app.get('/order', async(req,res)=>{
+      const email = req.query.email;
+      const query = {email: email}
+      const orders = await orderCollection.find(query).toArray();
+      res.send(orders)
+      
     })
 
     //post order 
