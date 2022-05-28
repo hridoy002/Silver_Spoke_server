@@ -103,6 +103,14 @@ async function run() {
       
     })
 
+    // get all order
+    app.get('/orders', async(req,res)=>{
+      const query ={};
+      const cursor = orderCollection.find(query);
+      const allorder = await cursor.toArray();
+      res.send(allorder);
+    })
+
     //post order 
     app.post('/order', async (req, res) => {
       const data = req.body;
