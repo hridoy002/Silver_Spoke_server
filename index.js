@@ -23,13 +23,14 @@ async function run() {
     const usersCollection = client.db("silver-spoke").collection("users");
     const orderCollection = client.db("silver-spoke").collection("order");
     const reviewCollection = client.db("silver-spoke").collection("review");
+    const profileCollection = client.db("silver-spoke").collection("profile");
 
 
     // get all tools 
     app.get("/tools", async (req, res) => {
       const query = {};
       const cursor = toolsCollection.find(query);
-      const tools = await cursor.limit(3).toArray();
+      const tools = await cursor.toArray();
       res.send(tools.reverse());
     })
 
@@ -42,6 +43,14 @@ async function run() {
       res.send(item);
     })
 
+    //tools post
+    app.post('/tools', async(req,res)=>{
+      const tools = req.body;
+      const result = await toolsCollection.insertOne(tools);
+      res.send(result);
+    })
+
+
     // admin 
     app.put('/user/admin/:email', async (req, res) => {
       const email = req.params.email;
@@ -52,6 +61,16 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc);
       res.send(result);
     })
+
+    // check admin or normal user 
+    app.get('/admin/:email', async(req,res)=> {
+      const email = req.params.email;
+      const user = await usersCollection.findOne({email: email});
+
+      const isAdmin = user.role === 'admin';
+      res.send({admin: isAdmin});
+    }
+)
 
     // user store on db
     app.put('/user/:email', async (req, res) => {
@@ -66,6 +85,19 @@ async function run() {
       const result = await usersCollection.updateOne(filter, updateDoc, options);
       const token = jwt.sign({ email: email }, process.env.SECRET_TOKEN, { expiresIn: '5h' })
       res.send({ result, token });
+    })
+
+    //user profile update
+    app.put('/profile/:email', async(req,res)=>{
+      const email = req.params.email;
+      const profile = req.body;
+      const filter = {email: email};
+      const options = {upsert:true};
+      const updateDoc = {
+        $set: profile,
+      };
+      const result = await profileCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
     })
 
     //get all user
@@ -117,6 +149,7 @@ async function run() {
       const result = await orderCollection.insertOne(data);
       res.send(result);
     })
+
   }
   finally {
 
@@ -151,20 +184,3 @@ app.listen(port, () => {
 
 
 
-// const products = [{
-//     name: 'Bat',
-//     price: 700,
-//     description: 'Kashmiri willow'
-// },{
-//     name: 'Ball',
-//     price: 700,
-//     description: 'Kokabura sd ball'
-// },
-// {
-//     name: 'Stump',
-//     price: 700,
-//     description: 'Wooden'
-// }];
-
-// const search = products.filter(product => product.name == 'Bat');
-// console.log(search)
