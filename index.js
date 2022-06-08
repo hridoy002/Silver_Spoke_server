@@ -166,7 +166,7 @@ app.listen(port, () => {
   console.log(`Silver Spoke server condition good ${port}`)
 })
 
-
+// private to public check
 
 
 
